@@ -12,9 +12,9 @@ const styleObj = computed<CSSProperties>(() => {
 </script>
 
 <template>
-  <button :style="styleObj">
+  <button class="h-button" :style="styleObj">
     <slot>this is default button</slot>
   </button>
 </template>
 
-<style lang="less" scoped></style>
+<style lang="css" scoped></style>
