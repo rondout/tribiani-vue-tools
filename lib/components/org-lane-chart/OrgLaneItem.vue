@@ -24,6 +24,9 @@ const props = withDefaults(
           <template #title="{ data }">
             <slot name="title" :data="data"> </slot>
           </template>
+          <template #content="{ data }">
+            <slot name="content" :data="data"> </slot>
+          </template>
         </OrgDetailItem>
       </div>
       <!-- 这里迭代出来的一定有父级 -->
@@ -31,6 +34,10 @@ const props = withDefaults(
         <!-- @vue-ignore -->
         <template #title="{ data }">
           <slot name="title" :data="(data as OrgTree)"> </slot>
+        </template>
+        <!-- @vue-ignore -->
+        <template #content="{ data }">
+          <slot name="content" :data="(data as OrgTree)"> </slot>
         </template>
       </OrgLaneItem>
     </div>

@@ -69,8 +69,10 @@ const parseLeftDistance = (index: number): number => {
     </div>
     <OrgLaneItem :data="displayedData">
       <template #title="{ data }">
-        <!-- <span>{{ data.label }}</span> -->
         <slot name="title" :data="(data as OrgTree)"> </slot>
+      </template>
+      <template #content="{ data }">
+        <slot name="content" :data="(data as OrgTree)"> </slot>
       </template>
     </OrgLaneItem>
   </div>

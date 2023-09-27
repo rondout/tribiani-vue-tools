@@ -104,9 +104,11 @@ const title = computed(() => {
           />
         </template>
       </div>
-      <div class="sub-content flex-center flex-column">
-        <div class="sub-content-title">{{ props.data.label }}</div>
-      </div>
+      <slot name="content" :data="props.data">
+        <div class="sub-content flex-center flex-column">
+          <div class="sub-content-title">{{ props.data.label }}</div>
+        </div>
+      </slot>
     </div>
   </div>
 </template>

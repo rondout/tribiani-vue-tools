@@ -6,6 +6,9 @@ import { orgDatas } from "./data";
 <template>
   <org-lane-chart :treeData="orgDatas">
     <template #title="{ data }">{{ data.id }}</template>
+    <template #content="{ data }">
+      <p>{{ data.label }}</p>
+    </template>
   </org-lane-chart>
 </template>
 
