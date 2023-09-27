@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { OrgTree } from "./data";
-import { defineOptions } from "vue";
 import OrgDetailItem from "./OrgDetailItem.vue";
 
 defineOptions({ name: "OrgLaneItem" });
@@ -10,36 +9,30 @@ const props = withDefaults(
     index: 0,
   }
 );
-
-
 </script>
 
 <template>
   <div class="org-lane-container">
     <div v-for="(item, index) of props.data" :key="item.id" class="lane-item">
-      <template v-if="true || !item.collapsed">
-        <div style="margin-right: 16px">
-          <!-- 只有第一行才显示 -->
-          <div
-            class="title flex-center"
-            v-if="index === 0 && props.index === 0"
-          >
-            {{ item.type }}
-          </div>
-          <OrgDetailItem
-            :index="index"
-            :total="props.data?.length"
-            :has-parent="props.hasParent"
-            :data="item"
-          />
-        </div>
-        <!-- 这里迭代出来的一定有父级 -->
-        <OrgLaneItem
-          has-parent
-          :data="item.children"
+      <div style="margin-right: 16px">
+        <OrgDetailItem
           :index="index"
-        ></OrgLaneItem
-      ></template>
+          :total="props.data?.length"
+          :has-parent="props.hasParent"
+          :data="item"
+        >
+          <template #title="{ data }">
+            <slot name="title" :data="data"> </slot>
+          </template>
+        </OrgDetailItem>
+      </div>
+      <!-- 这里迭代出来的一定有父级 -->
+      <OrgLaneItem has-parent :data="item.children" :index="index">
+        <!-- @vue-ignore -->
+        <template #title="{ data }">
+          <slot name="title" :data="(data as OrgTree)"> </slot>
+        </template>
+      </OrgLaneItem>
     </div>
   </div>
 </template>
@@ -65,7 +58,7 @@ const props = withDefaults(
   height: 100%;
   display: flex;
   width: 216px;
-  background-color: #f8f9fb;
+  // background-color: #f8f9fb;
   //   border: 1px solid #e5e6eb;
   border-radius: 2px;
   .title {

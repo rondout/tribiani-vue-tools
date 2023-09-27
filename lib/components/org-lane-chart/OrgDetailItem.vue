@@ -84,16 +84,18 @@ const title = computed(() => {
       }"
     >
       <div class="subtitle flex-between">
-        <span>{{ title + props.data.collapsed }}</span>
+        <slot name="title" :data="props.data">
+          <span>{{ title }}</span>
+        </slot>
         <template v-if="props.data?.hasChild">
-            <img
+          <img
             v-if="!props.data?.collapsed"
             @click="handleClick(props.data.id, true)"
             :src="arrowLeft"
             class="org-icon"
             alt=""
-            />
-            <img
+          />
+          <img
             v-else
             @click="handleClick(props.data.id, false)"
             :src="arrowRight"
@@ -104,30 +106,6 @@ const title = computed(() => {
       </div>
       <div class="sub-content flex-center flex-column">
         <div class="sub-content-title">{{ props.data.label }}</div>
-        <div v-if="hasChild" class="sub-content-title">
-          {{ props.data.label }}
-        </div>
-        <div v-if="hasChild" class="sub-content-title">
-          {{ props.data.label }}
-        </div>
-        <div v-if="hasChild" class="sub-content-title">
-          {{ props.data.label }}
-        </div>
-        <div v-if="hasChild" class="sub-content-title">
-          {{ props.data.label }}
-        </div>
-        <div v-if="hasChild" class="sub-content-title">
-          {{ props.data.label }}
-        </div>
-        <div v-if="hasChild" class="sub-content-title">
-          {{ props.data.label }}
-        </div>
-        <div v-if="hasChild" class="sub-content-title">
-          {{ props.data.label }}
-        </div>
-        <div v-if="hasChild" class="sub-content-title">
-          {{ props.data.label }}
-        </div>
       </div>
     </div>
   </div>

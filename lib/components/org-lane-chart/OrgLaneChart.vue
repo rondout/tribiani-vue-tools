@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { orgDatas, ExpanClickInjectionKey, OrgTree, parseTreeLevel } from "./data";
+import { ExpanClickInjectionKey, OrgTree, parseTreeLevel } from "./data";
 import OrgLaneItem from "./OrgLaneItem.vue";
 import "../main.css";
 import { deepClone } from "../../tools";
 import { provide } from "vue";
 import { ref } from "vue";
 import { computed } from "vue";
+
+const props = defineProps<{ treeData: OrgTree[] }>();
 
 // const state = reactive({
 //   elId: "lane-chart-container",
@@ -15,7 +17,7 @@ import { computed } from "vue";
 const collapsedIds = ref<(string | number)[]>([]);
 
 const displayedData = computed<OrgTree[]>(() => {
-  const newTreeData = deepClone(orgDatas);
+  const newTreeData = deepClone(props.treeData);
   const checkCollapsed = (treeDatas: OrgTree[]) => {
     treeDatas.forEach((item) => {
       item.hasChild = item.children?.length > 0;
@@ -43,23 +45,57 @@ const handleExpandClick = (id: string | number, isCollapse: boolean) => {
 
 provide(ExpanClickInjectionKey, handleExpandClick);
 
-const labelAndLevel =computed(() => {
-    return parseTreeLevel(displayedData.value)
-})
+const labelAndLevel = computed(() => {
+  return parseTreeLevel(displayedData.value);
+});
+
+const parseLeftDistance = (index: number): number => {
+  if (!index) {
+    return 16;
+  }
+  return index * 216 + (index + 1) * 16;
+};
 </script>
 
 <template>
   <div id="lane-chart-container">
-    <p>{{ labelAndLevel }}</p>
-    <OrgLaneItem :data="displayedData"></OrgLaneItem>
+    <div
+      v-for="(levelData, index) of labelAndLevel.labels || []"
+      :style="{ left: parseLeftDistance(index) + 'px' }"
+      :key="levelData"
+      class="lane-bg-item"
+    >
+      <div class="flex-center title">{{ levelData }}</div>
+    </div>
+    <OrgLaneItem :data="displayedData">
+      <template #title="{ data }">
+        <!-- <span>{{ data.label }}</span> -->
+        <slot name="title" :data="(data as OrgTree)"> </slot>
+      </template>
+    </OrgLaneItem>
   </div>
 </template>
 
 <style lang="less" scoped>
 #lane-chart-container {
-  min-width: 1080px;
+  /* min-width: 1080px; */
   min-height: 600px;
-  //   background-color: #d9d9d9;
+  width: 100%;
   padding: 16px;
+  padding-top: 40px;
+  box-sizing: border-box;
+  position: relative;
+  // background: rgba(128, 119, 119, 0.231);
+  .lane-bg-item {
+    background-color: #ecf0fb;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 216px;
+    .title {
+      height: 36px;
+      border-bottom: 1px solid #e5e6eb;
+    }
+  }
 }
 </style>

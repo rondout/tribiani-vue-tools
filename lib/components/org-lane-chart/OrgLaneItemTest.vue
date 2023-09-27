@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { OrgTree } from "./data";
 import arrowRight from "../../assets/arrow-right.svg";
-import { defineOptions } from "vue";
+// import { defineOptions } from "vue";
 
 defineOptions({ name: "OrgLaneItemTest" });
 const props = defineProps<{ data: OrgTree[] }>();
