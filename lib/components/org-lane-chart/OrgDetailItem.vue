@@ -88,20 +88,20 @@ const title = computed(() => {
           <span>{{ title }}</span>
         </slot>
         <template v-if="props.data?.hasChild">
-          <img
-            v-if="!props.data?.collapsed"
-            @click="handleClick(props.data.id, true)"
-            :src="arrowLeft"
-            class="org-icon"
-            alt=""
-          />
-          <img
-            v-else
-            @click="handleClick(props.data.id, false)"
-            :src="arrowRight"
-            class="org-icon"
-            alt=""
-          />
+          <template v-if="!props.data?.collapsed">
+            <div class="org-icon" @click="handleClick(props.data.id, true)">
+              <slot name="collapse-icon">
+                <img :src="arrowLeft" alt="" />
+              </slot>
+            </div>
+          </template>
+          <template v-else>
+            <div class="org-icon" @click="handleClick(props.data.id, false)">
+              <slot name="expand-icon">
+                <img :src="arrowRight" alt="" />
+              </slot>
+            </div>
+          </template>
         </template>
       </div>
       <slot name="content" :data="props.data">
@@ -115,6 +115,7 @@ const title = computed(() => {
 
 <style lang="less" scoped>
 .org-item-container {
+  cursor: pointer;
   //   height: calc(100% - 36px);
   height: 100%;
   //   padding-top: 16px;
@@ -123,21 +124,22 @@ const title = computed(() => {
   .org-item-content {
     display: flex;
     flex-direction: column;
-    margin: 32px 0;
-    background-color: #fff;
+    margin: 12px 0;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.08);
     width: 184px;
-    min-height: 134px;
+    min-height: 60px;
     .subtitle {
-      background-color: #c6e3ff;
+      // background-color: #c6e3ff;
       height: 32px;
       font-size: 14px;
       color: #5b5b5b;
-      padding: 0 12px;
+      position: relative;
       .org-icon {
         height: 18px;
         width: 18px;
         cursor: pointer;
+        position: absolute;
+        right: 6px;
       }
     }
     .sub-content {
@@ -149,7 +151,7 @@ const title = computed(() => {
     }
   }
   .org-item-content-has-child {
-    background-color: #3f51b5;
+    // background-color: #3f51b5;
     position: relative;
   }
 
@@ -160,11 +162,11 @@ const title = computed(() => {
     right: -25px;
     width: 25px;
     height: 2px;
-    background-color: #3f51b5;
+    background-color: #fa9e18;
   }
 
   .org-item-content-has-parent {
-    background-color: skyblue;
+    // background-color: skyblue;
     position: relative;
   }
 
@@ -175,8 +177,12 @@ const title = computed(() => {
     left: -25px;
     width: 25px;
     height: 2px;
-    background-color: #3f51b5;
+    background-color: #fa9e18;
   }
+}
+
+.org-item-content {
+  background-color: #fff;
 }
 .org-item-container-with-parent::before {
   content: "";
@@ -184,7 +190,7 @@ const title = computed(() => {
   //   top: 50%;
   height: 50%;
   width: 2px;
-  background-color: blueviolet;
+  background-color: #fa9e18;
   left: -9px;
 }
 .last-child::before {

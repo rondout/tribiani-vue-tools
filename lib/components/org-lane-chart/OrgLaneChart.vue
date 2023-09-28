@@ -74,6 +74,13 @@ const parseLeftDistance = (index: number): number => {
       <template #content="{ data }">
         <slot name="content" :data="(data as OrgTree)"> </slot>
       </template>
+
+      <template #expand-icon>
+        <slot name="expand-icon"> </slot>
+      </template>
+      <template #collapse-icon>
+        <slot name="collapse-icon"> </slot>
+      </template>
     </OrgLaneItem>
   </div>
 </template>
@@ -96,8 +103,11 @@ const parseLeftDistance = (index: number): number => {
     width: 216px;
     .title {
       height: 36px;
-      border-bottom: 1px solid #e5e6eb;
+      border-bottom: 1px solid #f8f9fb;
     }
+  }
+  .lane-bg-item:nth-child(2n-1) {
+    background-color: #f8f9fb;
   }
 }
 </style>
