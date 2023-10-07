@@ -7,7 +7,7 @@ import { provide } from "vue";
 import { ref } from "vue";
 import { computed } from "vue";
 
-const props = defineProps<{ treeData: OrgTree[] }>();
+const props = defineProps<{ treeData: OrgTree[]; id?: string }>();
 
 // const state = reactive({
 //   elId: "lane-chart-container",
@@ -51,37 +51,39 @@ const labelAndLevel = computed(() => {
 
 const parseLeftDistance = (index: number): number => {
   if (!index) {
-    return 16;
+    return 0;
   }
-  return index * 216 + (index + 1) * 16;
+  return index * 216 + index * 16;
 };
 </script>
 
 <template>
-  <div id="lane-chart-container">
-    <div
-      v-for="(levelData, index) of labelAndLevel.labels || []"
-      :style="{ left: parseLeftDistance(index) + 'px' }"
-      :key="levelData"
-      class="lane-bg-item"
-    >
-      <div class="flex-center title">{{ levelData }}</div>
-    </div>
-    <OrgLaneItem :data="displayedData">
-      <template #title="{ data }">
-        <slot name="title" :data="(data as OrgTree)"> </slot>
-      </template>
-      <template #content="{ data }">
-        <slot name="content" :data="(data as OrgTree)"> </slot>
-      </template>
+  <div :id="props.id">
+    <div id="lane-chart-container">
+      <div
+        v-for="(levelData, index) of labelAndLevel.labels || []"
+        :style="{ left: parseLeftDistance(index) + 'px' }"
+        :key="levelData"
+        class="lane-bg-item"
+      >
+        <div class="flex-center title">{{ levelData }}</div>
+      </div>
+      <OrgLaneItem :data="displayedData">
+        <template #title="{ data }">
+          <slot name="title" :data="(data as OrgTree)"> </slot>
+        </template>
+        <template #content="{ data }">
+          <slot name="content" :data="(data as OrgTree)"> </slot>
+        </template>
 
-      <template #expand-icon>
-        <slot name="expand-icon"> </slot>
-      </template>
-      <template #collapse-icon>
-        <slot name="collapse-icon"> </slot>
-      </template>
-    </OrgLaneItem>
+        <template #expand-icon>
+          <slot name="expand-icon"> </slot>
+        </template>
+        <template #collapse-icon>
+          <slot name="collapse-icon"> </slot>
+        </template>
+      </OrgLaneItem>
+    </div>
   </div>
 </template>
 
@@ -90,7 +92,7 @@ const parseLeftDistance = (index: number): number => {
   /* min-width: 1080px; */
   min-height: 600px;
   width: 100%;
-  padding: 16px;
+  padding-bottom: 16px;
   padding-top: 40px;
   box-sizing: border-box;
   position: relative;

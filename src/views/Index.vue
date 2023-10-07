@@ -4,7 +4,7 @@ import { orgDatas } from "./data";
 </script>
 
 <template>
-  <org-lane-chart :treeData="orgDatas">
+  <org-lane-chart id="test" :treeData="orgDatas">
     <template #title="{ data }">
       <div class="tree-title">{{ data.id }}</div>
     </template>
