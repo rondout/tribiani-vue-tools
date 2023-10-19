@@ -2,10 +2,15 @@
 import { computed } from "vue";
 import arrowRight from "../../assets/arrow-right.svg";
 import arrowLeft from "../../assets/arrow-left.svg";
-import { ExpanClickInjectionKey, OrgTree } from "./data";
+import {
+  ExpanClickInjectionKey,
+  FieldNamesInjectionKey,
+  OrgTree,
+} from "./data";
 import { inject } from "vue";
 
 const handleClick = inject(ExpanClickInjectionKey);
+const fieldNames = inject(FieldNamesInjectionKey);
 
 const props = defineProps<{
   data: OrgTree;
@@ -15,7 +20,7 @@ const props = defineProps<{
 }>();
 
 const hasChild = computed(() => {
-  return props.data?.children?.length > 0;
+  return props.data && props.data[fieldNames.children]?.length > 0;
 });
 
 /**
@@ -77,36 +82,54 @@ const title = computed(() => {
     }"
   >
     <div
+      class="global-slot-container"
       :class="{
-        'org-item-content': true,
+        // 'org-item-content': true,
         'org-item-content-has-child': hasChild,
         'org-item-content-has-parent': hasParent,
       }"
     >
-      <div class="subtitle flex-between">
-        <slot name="title" :data="props.data">
-          <span>{{ title }}</span>
-        </slot>
-        <template v-if="props.data?.hasChild">
-          <template v-if="!props.data?.collapsed">
-            <div class="org-icon" @click="handleClick(props.data.id, true)">
-              <slot name="collapse-icon">
-                <img :src="arrowLeft" alt="" />
-              </slot>
+      <slot :data="props.data">
+        <div
+          @click="() => console.log(data)"
+          v-if="props.data[fieldNames.isEmptyItem]"
+          style="height: 2px; background-color: #fa9e18; margin-top: 2px"
+        ></div>
+        <div v-else class="org-item-content">
+          <div class="subtitle flex-between">
+            <slot name="title" :data="props.data">
+              <span>{{ title }}</span>
+            </slot>
+            <template v-if="props.data?.hasChild">
+              <template v-if="!props.data?.collapsed">
+                <div
+                  class="org-icon"
+                  @click="handleClick(props.data[fieldNames.id], true)"
+                >
+                  <slot name="collapse-icon">
+                    <img :src="arrowLeft" alt="" />
+                  </slot>
+                </div>
+              </template>
+              <template v-else>
+                <div
+                  class="org-icon"
+                  @click="handleClick(props.data[fieldNames.id], false)"
+                >
+                  <slot name="expand-icon">
+                    <img :src="arrowRight" alt="" />
+                  </slot>
+                </div>
+              </template>
+            </template>
+          </div>
+          <slot name="content" :data="props.data">
+            <div class="sub-content flex-center flex-column">
+              <div class="sub-content-title">
+                {{ props.data[fieldNames.label] }}
+              </div>
             </div>
-          </template>
-          <template v-else>
-            <div class="org-icon" @click="handleClick(props.data.id, false)">
-              <slot name="expand-icon">
-                <img :src="arrowRight" alt="" />
-              </slot>
-            </div>
-          </template>
-        </template>
-      </div>
-      <slot name="content" :data="props.data">
-        <div class="sub-content flex-center flex-column">
-          <div class="sub-content-title">{{ props.data.label }}</div>
+          </slot>
         </div>
       </slot>
     </div>
@@ -121,6 +144,9 @@ const title = computed(() => {
   //   padding-top: 16px;
   width: 216px;
   position: relative;
+  .global-slot-container {
+    width: 184px;
+  }
   .org-item-content {
     display: flex;
     flex-direction: column;
@@ -205,5 +231,26 @@ const title = computed(() => {
 }
 .not-first-last-child::before {
   height: 100%;
+}
+</style>
+
+<style lang="less">
+.org-item-content-has-parent::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -25px;
+  width: 25px;
+  height: 2px;
+  background-color: #fa9e18;
+}
+.org-item-content-has-child::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -25px;
+  width: 25px;
+  height: 2px;
+  background-color: #fa9e18;
 }
 </style>

@@ -1,15 +1,27 @@
 <script lang="ts" setup>
+import { OrgFieldNames } from "../../lib/components";
 import OrgLaneChart from "../../lib/components/org-lane-chart/OrgLaneChart.vue";
-import { orgDatas } from "./data";
+import { constructTreeData, orgDatas } from "./data";
+
+const fieldNames: OrgFieldNames = {
+  label: "subProjectName",
+  type: "levelItemType",
+  isEmptyItem: "isEmpty",
+};
 </script>
 
 <template>
-  <org-lane-chart id="test" :treeData="orgDatas">
+  <org-lane-chart
+    id="test"
+    :field-names="fieldNames"
+    :treeData="constructTreeData(orgDatas)"
+  >
     <template #title="{ data }">
       <div class="tree-title">{{ data.id }}</div>
     </template>
+    <template #levelData="{ data }">{{ data?.toLowerCase() }}</template>
     <template #content="{ data }">
-      <p>{{ data.label }}</p>
+      <p>{{ data.subProjectName }}</p>
     </template>
     <template #expand-icon>
       <div class="action-icon expand-icon"></div>

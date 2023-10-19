@@ -1,5 +1,11 @@
-<script lang="ts" setup>
-import { ExpanClickInjectionKey, OrgTree, parseTreeLevel } from "./data";
+<script lang="ts" setup generic="T extends string | number = number">
+import {
+  ExpanClickInjectionKey,
+  OrgTree,
+  parseTreeLevel,
+  OrgFieldNames,
+  FieldNamesInjectionKey,
+} from "./data";
 import OrgLaneItem from "./OrgLaneItem.vue";
 import "../main.css";
 import { deepClone } from "../../tools";
@@ -7,7 +13,11 @@ import { provide } from "vue";
 import { ref } from "vue";
 import { computed } from "vue";
 
-const props = defineProps<{ treeData: OrgTree[]; id?: string }>();
+const props = defineProps<{
+  treeData: OrgTree<T>[];
+  id?: string;
+  fieldNames?: OrgFieldNames;
+}>();
 
 // const state = reactive({
 //   elId: "lane-chart-container",
@@ -16,9 +26,9 @@ const props = defineProps<{ treeData: OrgTree[]; id?: string }>();
 // const data = ref(deepClone(orgDatas));
 const collapsedIds = ref<(string | number)[]>([]);
 
-const displayedData = computed<OrgTree[]>(() => {
+const displayedData = computed<OrgTree<T>[]>(() => {
   const newTreeData = deepClone(props.treeData);
-  const checkCollapsed = (treeDatas: OrgTree[]) => {
+  const checkCollapsed = (treeDatas: OrgTree<T>[]) => {
     treeDatas.forEach((item) => {
       item.hasChild = item.children?.length > 0;
       if (collapsedIds.value?.includes(item.id)) {
@@ -44,9 +54,16 @@ const handleExpandClick = (id: string | number, isCollapse: boolean) => {
 };
 
 provide(ExpanClickInjectionKey, handleExpandClick);
+provide(FieldNamesInjectionKey, {
+  id: props.fieldNames?.id || "id",
+  children: props.fieldNames?.children || "children",
+  label: props.fieldNames?.label || "label",
+  type: props.fieldNames?.type || "type",
+  isEmptyItem: props.fieldNames.isEmptyItem || "isEmptyItem",
+});
 
 const labelAndLevel = computed(() => {
-  return parseTreeLevel(displayedData.value);
+  return parseTreeLevel(displayedData.value, props.fieldNames?.type || "type");
 });
 
 const parseLeftDistance = (index: number): number => {
@@ -66,9 +83,18 @@ const parseLeftDistance = (index: number): number => {
         :key="levelData"
         class="lane-bg-item"
       >
-        <div class="flex-center title">{{ levelData }}</div>
+        <div class="flex-center title">
+          <slot name="levelData" :data="levelData">{{ levelData }}</slot>
+        </div>
       </div>
       <OrgLaneItem :data="displayedData">
+        <!-- <template #global> -->
+        <template #global="{ data }">
+          <slot name="global" :data="(data as OrgTree)"> </slot>
+          <!-- <div @click="() => console.log(data)">{{ data.label || "data" }}</div> -->
+        </template>
+        <div>100</div>
+        <!-- </template> -->
         <template #title="{ data }">
           <slot name="title" :data="(data as OrgTree)"> </slot>
         </template>

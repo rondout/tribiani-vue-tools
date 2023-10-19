@@ -1,13 +1,15 @@
 import { InjectionKey } from "vue";
 
-export interface OrgTree {
-  label: string;
-  id: string;
-  type: string;
+export interface OrgTree<T = string | number> {
+  label?: string;
+  id?: T;
+  type?: string;
   collapsed?: boolean;
   hasChild?: boolean;
+  isEmpty?: boolean;
   pid?: string;
-  children?: OrgTree[];
+  children?: OrgTree<T>[];
+  [propName: string]: any;
 }
 
 // export const orgDatas: OrgTree[] = [
@@ -135,14 +137,14 @@ export interface OrgTree {
 //   },
 // ];
 
-export function parseTreeLevel(data: OrgTree[]) {
+export function parseTreeLevel<T>(data: OrgTree<T>[], typeKey: string) {
   let labels: string[] = [];
   let level = 0;
 
-  function calcLabel(data: OrgTree[] = []) {
+  function calcLabel(data: OrgTree<T>[] = []) {
     data.forEach((item) => {
-      if (!labels.includes(item.type)) {
-        labels.push(item.type);
+      if (!labels.includes(item[typeKey])) {
+        labels.push(item[typeKey]);
       }
       if (item.children?.length) {
         calcLabel(item.children);
@@ -151,9 +153,21 @@ export function parseTreeLevel(data: OrgTree[]) {
   }
   calcLabel(data);
   level = labels.length;
+  console.log(labels, level);
+
   return { labels, level };
 }
 
 export const ExpanClickInjectionKey = Symbol() as InjectionKey<
   (id: string | number, isCollapse: boolean) => void
 >;
+
+export interface OrgFieldNames {
+  id?: string;
+  label?: string;
+  children?: string;
+  type?: string;
+  isEmptyItem?: string;
+}
+
+export const FieldNamesInjectionKey = Symbol() as InjectionKey<OrgFieldNames>;

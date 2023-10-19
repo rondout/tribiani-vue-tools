@@ -1,10 +1,10 @@
-<script lang="ts" setup>
+<script lang="ts" setup generic="T extends string | number = string">
 import { OrgTree } from "./data";
 import OrgDetailItem from "./OrgDetailItem.vue";
 
 defineOptions({ name: "OrgLaneItem" });
 const props = withDefaults(
-  defineProps<{ data: OrgTree[]; index?: number; hasParent?: boolean }>(),
+  defineProps<{ data: OrgTree<T>[]; index?: number; hasParent?: boolean }>(),
   {
     index: 0,
   }
@@ -18,9 +18,10 @@ const props = withDefaults(
         <OrgDetailItem
           :index="index"
           :total="props.data?.length"
-          :has-parent="props.hasParent"
+          :has-parent="props.hasParent || item.isEmptyItem"
           :data="item"
         >
+          <slot name="global" :data="item"> </slot>
           <template #title="{ data }">
             <slot name="title" :data="data"> </slot>
           </template>
@@ -39,11 +40,15 @@ const props = withDefaults(
       <OrgLaneItem has-parent :data="item.children" :index="index">
         <!-- @vue-ignore -->
         <template #title="{ data }">
-          <slot name="title" :data="(data as OrgTree)"> </slot>
+          <slot name="title" :data="(data as OrgTree<T>)"> </slot>
+        </template>
+        <!-- @vue-ignore -->
+        <template #global="{ data }">
+          <slot name="global" :data="(data as OrgTree<T>)"> </slot>
         </template>
         <!-- @vue-ignore -->
         <template #content="{ data }">
-          <slot name="content" :data="(data as OrgTree)"> </slot>
+          <slot name="content" :data="(data as OrgTree<T>)"> </slot>
         </template>
         <template #expand-icon>
           <slot name="expand-icon"> </slot>
