@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["./components.d.ts", "./auto-imports.d.ts"],
     "target": "ES2020",
     "useDefineForClassFields": true,
     "module": "ESNext",

@@ -1,7 +1,7 @@
 {
   "name": "tribiani-vue-tools",
   "private": false,
-  "version": "0.0.23",
+  "version": "0.0.29",
   "type": "module",
   "types": "dist/lib/main.d.ts",
   "homepage": "https://github.com/rondout/tribiani-vue-tools",
@@ -17,17 +17,21 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "pub": "pnpm build && npm publish"
   },
   "dependencies": {
     "tribiani-vue-tools": "^0.0.15",
     "vue": "^3.3.4"
   },
   "devDependencies": {
+    "@arco-design/web-vue": "^2.52.1",
     "@types/node": "^20.5.3",
     "@vitejs/plugin-vue": "^4.2.3",
     "less": "^4.2.0",
     "typescript": "^5.0.2",
+    "unplugin-auto-import": "^0.16.6",
+    "unplugin-vue-components": "^0.25.2",
     "vite": "^4.4.5",
     "vite-plugin-dts": "^3.5.2",
     "vue-tsc": "^1.8.5"

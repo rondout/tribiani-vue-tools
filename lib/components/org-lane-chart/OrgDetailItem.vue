@@ -102,20 +102,14 @@ const title = computed(() => {
             </slot>
             <template v-if="props.data?.hasChild">
               <template v-if="!props.data?.collapsed">
-                <div
-                  class="org-icon"
-                  @click="handleClick(props.data[fieldNames.id], true)"
-                >
+                <div class="org-icon" @click="handleClick(props.data, true)">
                   <slot name="collapse-icon">
                     <img :src="arrowLeft" alt="" />
                   </slot>
                 </div>
               </template>
               <template v-else>
-                <div
-                  class="org-icon"
-                  @click="handleClick(props.data[fieldNames.id], false)"
-                >
+                <div class="org-icon" @click="handleClick(props.data, false)">
                   <slot name="expand-icon">
                     <img :src="arrowRight" alt="" />
                   </slot>

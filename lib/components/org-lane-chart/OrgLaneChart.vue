@@ -12,31 +12,78 @@ import { deepClone } from "../../tools";
 import { provide } from "vue";
 import { ref } from "vue";
 import { computed } from "vue";
+import { watch } from "vue";
 
 const props = defineProps<{
   treeData: OrgTree<T>[];
   id?: string;
   fieldNames?: OrgFieldNames;
+  defaultDisplayedLevel?: number;
 }>();
+
+const fieldNames = computed(() => {
+  return {
+    id: props.fieldNames?.id || "id",
+    children: props.fieldNames?.children || "children",
+    label: props.fieldNames?.label || "label",
+    type: props.fieldNames?.type || "type",
+    isEmptyItem: props.fieldNames.isEmptyItem || "isEmptyItem",
+  };
+});
 
 // const state = reactive({
 //   elId: "lane-chart-container",
 // });
 
 // const data = ref(deepClone(orgDatas));
-const collapsedIds = ref<(string | number)[]>([]);
+const unCollapsedIds = ref<(string | number)[]>([]);
+
+const parseDefaultUnclollapsedIds = () => {
+  const defaultCollapsedIds: (string | number)[] = [];
+  const defaultDisplayedLevel =
+    props.defaultDisplayedLevel === undefined
+      ? Infinity
+      : props.defaultDisplayedLevel - 1 || 0;
+  const newTreeData = deepClone(props.treeData);
+
+  const checkDefaultDisplay = (treeDatas: OrgTree<T>[], level = 0) => {
+    treeDatas.forEach((item) => {
+      // 如果层级已经超出了就不再继续找应该展示得了（如果子集是empty则需要展示）
+      if (!item.isEmpty && level >= defaultDisplayedLevel) {
+        return;
+      }
+      defaultCollapsedIds.push(item[fieldNames.value.id]);
+      if (item.children?.length && level < defaultDisplayedLevel) {
+        checkDefaultDisplay(item.children || [], level + 1);
+      }
+    });
+    // }
+  };
+  checkDefaultDisplay(newTreeData);
+  unCollapsedIds.value.push(...defaultCollapsedIds);
+};
+
+watch(
+  () => props.treeData,
+  () => {
+    parseDefaultUnclollapsedIds();
+  },
+  { immediate: true }
+);
 
 const displayedData = computed<OrgTree<T>[]>(() => {
   const newTreeData = deepClone(props.treeData);
+
   const checkCollapsed = (treeDatas: OrgTree<T>[]) => {
     treeDatas.forEach((item) => {
-      item.hasChild = item.children?.length > 0;
-      if (collapsedIds.value?.includes(item.id)) {
+      item.hasChild = item[fieldNames.value.children]?.length > 0;
+      if (!unCollapsedIds.value?.includes(item.id) && !item.isEmpty) {
+        // 如果没有在已经展开的id列表里面
         item.collapsed = true;
-        delete item.children;
+        delete item[fieldNames.value.children];
       }
-      if (item.children?.length) {
-        checkCollapsed(item.children);
+      if (item[fieldNames.value.children]?.length) {
+        checkCollapsed(item[fieldNames.value.children]);
       }
     });
   };
@@ -44,26 +91,27 @@ const displayedData = computed<OrgTree<T>[]>(() => {
   return newTreeData;
 });
 
-const handleExpandClick = (id: string | number, isCollapse: boolean) => {
-  console.log(id, isCollapse);
+const handleExpandClick = (
+  data: OrgTree<string | number>,
+  isCollapse: boolean
+) => {
   if (isCollapse) {
-    collapsedIds.value.push(id);
+    unCollapsedIds.value = unCollapsedIds.value.filter((v) => v !== data.id);
   } else {
-    collapsedIds.value = collapsedIds.value.filter((v) => v !== id);
+    unCollapsedIds.value.push(data.id);
+    // data.children?.forEach((child) => {
+    //   if (child.isEmpty) {
+    //     unCollapsedIds.value.push(child.id);
+    //   }
+    // });
   }
 };
 
 provide(ExpanClickInjectionKey, handleExpandClick);
-provide(FieldNamesInjectionKey, {
-  id: props.fieldNames?.id || "id",
-  children: props.fieldNames?.children || "children",
-  label: props.fieldNames?.label || "label",
-  type: props.fieldNames?.type || "type",
-  isEmptyItem: props.fieldNames.isEmptyItem || "isEmptyItem",
-});
+provide(FieldNamesInjectionKey, fieldNames.value);
 
 const labelAndLevel = computed(() => {
-  return parseTreeLevel(displayedData.value, props.fieldNames?.type || "type");
+  return parseTreeLevel(props.treeData, props.fieldNames?.type || "type");
 });
 
 const parseLeftDistance = (index: number): number => {
@@ -91,7 +139,6 @@ const parseLeftDistance = (index: number): number => {
         <!-- <template #global> -->
         <template #global="{ data }">
           <slot name="global" :data="(data as OrgTree)"> </slot>
-          <!-- <div @click="() => console.log(data)">{{ data.label || "data" }}</div> -->
         </template>
         <div>100</div>
         <!-- </template> -->
