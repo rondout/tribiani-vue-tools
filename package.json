@@ -1,7 +1,7 @@
 {
   "name": "tribiani-vue-tools",
   "private": false,
-  "version": "0.0.30",
+  "version": "0.0.33",
   "type": "module",
   "types": "dist/lib/main.d.ts",
   "homepage": "https://github.com/rondout/tribiani-vue-tools",
@@ -21,6 +21,7 @@
     "pub": "pnpm build && npm publish"
   },
   "dependencies": {
+    "axios": "^1.6.0",
     "tribiani-vue-tools": "^0.0.15",
     "vue": "^3.3.4"
   },

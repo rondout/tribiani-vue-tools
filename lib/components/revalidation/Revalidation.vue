@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 // import RevalidateModal from "./RevalidateModal.vue";
 import { ref } from "vue";
-import { RevalidateType, RevalidateTypeOptions, openRevalidateModal } from "..";
+import { RevalidateType, RevalidateTypeOptions } from "..";
+import axios from "./axios";
 
 // const revalidateContentRef = ref<RevalidateContentInstance>();
 const type = ref(RevalidateType.SMS);
@@ -10,17 +11,36 @@ const type = ref(RevalidateType.SMS);
 
 const handleValidateOpen = () => {
   // visible.value = true;
-  openRevalidateModal({
-    type: type.value,
-    text: "hanshufei",
-    title: null,
-    onSuccess() {
-      console.log("校验成功");
-    },
-    onError() {
-      console.log("校验失败");
-    },
-  });
+  // openRevalidateModal({
+  //   type: type.value,
+  //   text: "hanshufei",
+  //   title: null,
+  //   onSuccess() {
+  //     console.log("校验成功");
+  //   },
+  //   onError() {
+  //     console.log("校验失败");
+  //   },
+  // });
+  axios.post(
+    "https://gatewaytest.wygsy.com/wygtech-oa/api/v1/notify/batchSave",
+    {
+      allFlag: false,
+      employeeInfoList: [
+        {
+          employeeId: "1648264233360948292",
+          personName: "田明明二",
+          mobile: "18515985422",
+          id: 9037,
+        },
+      ],
+      notifyTypeEnum: "EMPLOYEE_INFO",
+    }
+  );
+};
+
+const test = () => {
+  axios.delete("/wygtech-oa/api/v1/person/delete/1648264233360953433");
 };
 
 // const closeValidationModal = () => {
@@ -39,6 +59,7 @@ const handleValidateOpen = () => {
     >
   </a-radio-group>
   <a-button @click="handleValidateOpen">打开验证</a-button>
+  <a-button @click="test">打开图片验证</a-button>
   <!-- <RevalidateModal
     @cancel="closeValidationModal"
     :type="params.type"

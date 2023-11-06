@@ -1,7 +1,18 @@
 import { h, ref } from "vue";
 import RevalidateContentVue from "./RevalidateContent.vue";
 
+/**
+ * @description 验证的方式 短信、密码、滑块、输入文字
+ */
+export enum RevalidateType {
+  SMS = "SHORT_MSG",
+  PASSWORD = "PASSWORD",
+  IMAGE_CODE = "VALIDATE_CODE",
+  INPUT_TEXT = "INPUT_TEXT",
+}
+
 export interface RevalidateProps {
+  response: RevalidateTriggeredResponseData;
   type: RevalidateType;
   alertText?: string;
   visible?: boolean;
@@ -10,20 +21,10 @@ export interface RevalidateProps {
   text?: string;
 }
 
-/**
- * @description 验证的方式 短信、密码、滑块、输入文字
- */
-export enum RevalidateType {
-  SMS,
-  PASSWORD,
-  SLIDER,
-  INPUT_TEXT,
-}
-
 export const RevalidateTypeLabelMap = new Map([
   [RevalidateType.INPUT_TEXT, "文字输入验证"],
   [RevalidateType.PASSWORD, "密码验证"],
-  [RevalidateType.SLIDER, "滑块验证"],
+  [RevalidateType.IMAGE_CODE, "图片验证"],
   [RevalidateType.SMS, "短信验证"],
 ]);
 
@@ -55,8 +56,9 @@ export const openRevalidateModal = (args: RevalidateParams) => {
       h(RevalidateContentVue, {
         text: args.text,
         type: args.type,
-        alertText: "由于你半小时内连续下发短信3次，超过三次，我们需要二次验证",
+        alertText: args.alertText || "检测到你的操作有风险，我们需要二次验证",
         ref: revalidateContentRef,
+        response: args.response,
       }),
     onBeforeOk(done) {
       revalidateContentRef.value
@@ -72,3 +74,50 @@ export const openRevalidateModal = (args: RevalidateParams) => {
     },
   });
 };
+
+export enum OpenSafeServiceEnum {
+  短信发送操作 = "ROSTER_NOTIFY_MSG_LIMIT_OPEN_SAFE",
+  删除人员操作 = "ROSTER_DELETE_PERSON_LIMIT_OPEN_SAFE",
+}
+
+export interface BaseValidateParams {
+  openSafeService: OpenSafeServiceEnum;
+  openSafeType: RevalidateType;
+  md5Str: string;
+  mobile: string;
+}
+
+export interface MsgCodeValidateParams extends BaseValidateParams {
+  shortCode: string;
+}
+
+export interface ImageCodeValidateParams extends BaseValidateParams {
+  validateCode: string;
+}
+
+export interface StartValidateParams extends BaseValidateParams {
+  openSafeDesc: string;
+  openSafeTime: number;
+  openSafeReenterTxt: string;
+}
+
+export interface RevalidateTriggeredResponseData extends StartValidateParams {
+  mobile: string;
+}
+
+export interface StartValidateResponseData {
+  shortMsg?: string;
+  effectiveTime?: number;
+  image?: string;
+  validateCode?: string;
+  originalHeight?: number;
+  originalWidth?: number;
+}
+export interface StartValidateResponse {
+  data: StartValidateResponseData;
+}
+
+export interface RevalidateBaseResponse {
+  data: RevalidateTriggeredResponseData;
+  code: number;
+}

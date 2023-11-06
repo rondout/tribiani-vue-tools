@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import { RevalidateProps, RevalidateType } from "./config";
-// import SliderValidation from "./components/SliderValidation.vue";
+// import IMAGE_CODEValidation from "./components/IMAGE_CODEValidation.vue";
 import { ModalConfig } from "@arco-design/web-vue";
 
 const { title, visible, type, text } = defineProps<RevalidateProps>();
@@ -49,7 +49,7 @@ const getValidateCodeText = computed(() => {
         </div>
         <a-input placeholder="请输入文字"></a-input>
       </div>
-      <div v-else-if="type === RevalidateType.SLIDER"></div>
+      <div v-else-if="type === RevalidateType.IMAGE_CODE"></div>
       <div v-else-if="type === RevalidateType.SMS">
         <a-input placeholder="请输入11位的手机号" allow-clear>
           <template #prepend>

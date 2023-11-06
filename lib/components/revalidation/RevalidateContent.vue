@@ -4,18 +4,25 @@ import {
   RevalidateContentInstance,
   RevalidateProps,
   RevalidateType,
+  MsgCodeValidateParams,
+  StartValidateResponseData,
 } from "./config";
 import { reactive } from "vue";
 import { onMounted } from "vue";
 import { onBeforeUnmount } from "vue";
-// import SliderValidation from "./components/SliderValidation.vue";
+import { startValidate, handleRevalidate } from "./axios";
+import { watch } from "vue";
+import { mergeProps } from "vue";
+import { ImageCodeValidateParams } from "..";
+// import IMAGE_CODEValidation from "./components/IMAGE_CODEValidation.vue";
 
 let timer: number;
 
 class FormState {
   constructor(
-    public phoneNumber = "18512891630",
+    public phoneNumber = "",
     public verifyCode = "",
+    public imageCode = "",
     public inputText = "",
     public password = ""
   ) {}
@@ -24,21 +31,15 @@ class FormState {
 const SMS_TIMER_KEY = "REVALIDATION_SMS_SEND_TIME";
 // const phoneRegExp = /^1[3-9][0-9]{9}$/;
 
-const { type, text, alertText } = defineProps<RevalidateProps>();
+const props = defineProps<RevalidateProps>();
 // const emits = defineEmits<{ (e: "ok"): void; (e: "cancel"): void }>();
 
 const state = reactive({
   formModel: new FormState(),
   getVerifyCodeLoading: false,
+  getImageCodeLoading: false,
   sendCodeInterval: 0,
-});
-
-const safeDisplayPhoneNumber = computed(() => {
-  return (
-    state.formModel.phoneNumber.substring(0, 3) +
-    "****" +
-    state.formModel.phoneNumber.substring(7)
-  );
+  imgData: null as StartValidateResponseData,
 });
 
 //
@@ -79,13 +80,29 @@ const handleGetVerifyCode = async () => {
   // }
   state.getVerifyCodeLoading = true;
   // 模拟获取验证码
-  await Promise.resolve();
+  await startValidate(props.response);
+  // state.formModel.phoneNumber = data.data.mobile || "";
+  // state.formModel.verifyCode = responseData.data.shortMsg;
   state.getVerifyCodeLoading = false;
   // 把这一次发送的时间存入到localStorage
   console.log(new Date().valueOf().toString());
 
   localStorage.setItem(SMS_TIMER_KEY, new Date().valueOf().toString());
   initVerifyCodeSendTime();
+};
+
+// 获取图片验证码
+const handleGetImageCode = async () => {
+  try {
+    state.getImageCodeLoading = true;
+    const data = await startValidate(props.response);
+    state.imgData = data.data.data;
+    console.log(1111, state.imgData);
+
+    state.getImageCodeLoading = false;
+  } catch (error) {
+    state.getImageCodeLoading = false;
+  }
 };
 
 const getVerifyCodeText = computed(() => {
@@ -99,14 +116,50 @@ const getVerifyCodeDisabled = computed(() => {
   return state.sendCodeInterval > 0;
 });
 
+const valdiateImageCode = async () => {
+  if (!state.formModel.imageCode) {
+    AMessage.error("请输入图片计算结果");
+    return false;
+  }
+  // 如果用户填写了校验码，则发起请求等校验结果
+  const params: ImageCodeValidateParams = {
+    validateCode: state.formModel.imageCode,
+    ...props.response,
+  };
+  try {
+    const data = await handleRevalidate(params);
+    if (data.data.success === true) {
+      return true;
+    } else if (data.data.msg) {
+      AMessage.error(data.data.msg);
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+};
+
 const validateVerifyCode = async () => {
   if (!state.formModel.verifyCode) {
     AMessage.error("请输入验证码");
     return false;
   }
   // 如果用户填写了校验码，则发起请求等校验结果
-  const data = await Promise.resolve(true);
-  return data;
+  const params: MsgCodeValidateParams = {
+    shortCode: state.formModel.verifyCode,
+    ...props.response,
+  };
+  try {
+    const data = await handleRevalidate(params);
+    if (data.data.success === true) {
+      return true;
+    } else if (data.data.msg) {
+      AMessage.error(data.data.msg);
+      return false;
+    }
+  } catch (error) {
+    return false;
+  }
 };
 
 const valdiatePassword = async () => {
@@ -119,7 +172,7 @@ const valdiatePassword = async () => {
 
 const valdiateInputText = async () => {
   // return true;
-  if (text !== state.formModel.inputText) {
+  if (props.text !== state.formModel.inputText) {
     AMessage.error("您的输入有误，请重新输入");
     return false;
   }
@@ -129,7 +182,7 @@ const valdiateInputText = async () => {
 const validate = () => {
   return new Promise<boolean>(async (resolve, reject) => {
     let res: boolean;
-    switch (type) {
+    switch (props.type) {
       case RevalidateType.SMS:
         res = await validateVerifyCode();
         break;
@@ -138,6 +191,9 @@ const validate = () => {
         break;
       case RevalidateType.INPUT_TEXT:
         res = await valdiateInputText();
+        break;
+      case RevalidateType.IMAGE_CODE:
+        res = await valdiateImageCode();
         break;
       default:
         break;
@@ -150,6 +206,20 @@ const validate = () => {
     }
   });
 };
+
+watch(
+  () => mergeProps,
+  () => {
+    console.log({ props });
+    state.formModel.phoneNumber = props.response.mobile;
+    if (props.type === RevalidateType.IMAGE_CODE) {
+      handleGetImageCode();
+    }
+  },
+  {
+    immediate: true,
+  }
+);
 
 const handleCancel = () => {
   state.formModel = new FormState();
@@ -184,11 +254,22 @@ defineExpose<RevalidateContentInstance>({
         placeholder="请输入文字"
       ></a-input>
     </div>
-    <div v-else-if="type === RevalidateType.SLIDER"></div>
+    <div v-else-if="type === RevalidateType.IMAGE_CODE">
+      <div
+        style="display: flex; flex-wrap: nowrap; justify-content: space-between"
+      >
+        <a-input
+          style="margin-right: 64px"
+          placeholder="请输入图片计算结果"
+          v-model="state.formModel.imageCode"
+        ></a-input>
+        <img :src="state.imgData?.image" :width="150" :height="34" />
+      </div>
+    </div>
     <div v-else-if="type === RevalidateType.SMS">
       <a-input
         disabled
-        v-model="safeDisplayPhoneNumber"
+        v-model="state.formModel.phoneNumber"
         placeholder="请输入11位的手机号"
         :max-length="11"
         allow-clear

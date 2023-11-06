@@ -1,5 +1,5 @@
 <script lang="ts" setup></script>
 
-<template>SliderValidation</template>
+<template>IMAGE_CODEValidation</template>
 
 <style lang="less" scoped></style>
