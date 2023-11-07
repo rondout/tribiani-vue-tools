@@ -11,10 +11,6 @@ declare module 'vue' {
     AButton: typeof import('@arco-design/web-vue')['Button']
     AInput: typeof import('@arco-design/web-vue')['Input']
     AInputPassword: typeof import('@arco-design/web-vue')['InputPassword']
-    ARadio: typeof import('@arco-design/web-vue')['Radio']
-    ARadioGroup: typeof import('@arco-design/web-vue')['RadioGroup']
-    ATabPane: typeof import('@arco-design/web-vue')['TabPane']
-    ATabs: typeof import('@arco-design/web-vue')['Tabs']
     HelloWorlds: typeof import('./src/components/HelloWorlds.vue')['default']
   }
 }
