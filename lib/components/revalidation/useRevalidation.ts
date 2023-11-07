@@ -1,10 +1,6 @@
 import { RevalidateTriggeredResponseData, openRevalidateModal } from "..";
 
 export function useRevalidation(params: RevalidateTriggeredResponseData) {
-  // const revalidateContentRef = ref<RevalidateContentInstance>();
-  // const text = ref("hanshufei");
-  // const visible = ref(false);
-
   const handleValidateOpen = () => {
     // visible.value = true;
     openRevalidateModal({

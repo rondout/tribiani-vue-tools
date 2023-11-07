@@ -97,8 +97,6 @@ const handleGetImageCode = async () => {
     state.getImageCodeLoading = true;
     const data = await startValidate(props.response);
     state.imgData = data.data.data;
-    console.log(1111, state.imgData);
-
     state.getImageCodeLoading = false;
   } catch (error) {
     state.getImageCodeLoading = false;
@@ -263,7 +261,14 @@ defineExpose<RevalidateContentInstance>({
           placeholder="请输入图片计算结果"
           v-model="state.formModel.imageCode"
         ></a-input>
-        <img :src="state.imgData?.image" :width="150" :height="34" />
+        <a-tooltip content="点击图片切换下一张图片">
+          <img
+            @click="handleGetImageCode"
+            :src="state.imgData?.image"
+            :width="150"
+            :height="34"
+          />
+        </a-tooltip>
       </div>
     </div>
     <div v-else-if="type === RevalidateType.SMS">

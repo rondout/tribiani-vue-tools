@@ -40,7 +40,7 @@ const handleValidateOpen = () => {
 };
 
 const test = () => {
-  axios.delete("/wygtech-oa/api/v1/person/delete/1648264233360953433");
+  axios.delete("/wygtech-oa/api/v1/person/delete/1648264233360953401");
 };
 
 // const closeValidationModal = () => {

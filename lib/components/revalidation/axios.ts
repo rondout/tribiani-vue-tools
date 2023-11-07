@@ -10,6 +10,12 @@ import {
 
 export const REVALIDATE_TRIGGER_CODE = 5001;
 
+/**
+ *
+ * @param {AxiosResponse} response 后台返回来的response
+ * @param {string} baseUrl 后台请求的网关地址
+ * @returns
+ */
 export const interceptRevalidateResponse = (
   response: AxiosResponse<RevalidateBaseResponse>,
   baseUrl = "https://gatewaytest.wygsy.com"
