@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import path from "path";
+import path, { resolve } from "path";
 import dts from "vite-plugin-dts";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
@@ -22,6 +22,7 @@ export default defineConfig({
       ],
     }),
   ],
+  envDir: resolve("env"),
   build: {
     lib: {
       // Could also be a dictionary or array of multiple entry points
