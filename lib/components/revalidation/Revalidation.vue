@@ -50,6 +50,7 @@ const test = () => {
 
 <template>
   <h2>This is Revalidation Components</h2>
+  <a-input></a-input>
   <a-radio-group v-model="type">
     <a-radio
       v-for="item of RevalidateTypeOptions"

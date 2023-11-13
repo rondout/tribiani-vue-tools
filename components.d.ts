@@ -7,11 +7,6 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    AAlert: typeof import('@arco-design/web-vue')['Alert']
-    AButton: typeof import('@arco-design/web-vue')['Button']
-    AInput: typeof import('@arco-design/web-vue')['Input']
-    AInputPassword: typeof import('@arco-design/web-vue')['InputPassword']
-    ATooltip: typeof import('@arco-design/web-vue')['Tooltip']
     HelloWorlds: typeof import('./src/components/HelloWorlds.vue')['default']
   }
 }
