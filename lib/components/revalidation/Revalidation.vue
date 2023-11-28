@@ -23,7 +23,7 @@ const handleValidateOpen = () => {
   //   },
   // });
   axios.post(
-    "https://gatewaytest.wygsy.com/wygtech-oa/api/v1/notify/batchSave",
+    "https://gatewaytest.wygsy.com/base-platform/api/v1/notify/batchSave",
     {
       allFlag: false,
       employeeInfoList: [
@@ -40,7 +40,7 @@ const handleValidateOpen = () => {
 };
 
 const test = () => {
-  axios.delete("/wygtech-oa/api/v1/person/delete/1648264233360953401");
+  axios.delete("/base-platform/api/v1/person/delete/1648264233360953401");
 };
 
 // const closeValidationModal = () => {

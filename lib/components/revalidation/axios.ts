@@ -57,7 +57,7 @@ export async function startValidate(params: StartValidateParams) {
   try {
     axios.defaults.baseURL = baseURL;
     const data = await axios.post<StartValidateResponse>(
-      "/wygtech-oa/api/v1/safe/openSafe/start",
+      "/base-platform/api/v1/safe/openSafe/start",
       params
     );
     console.log(data.data);
@@ -71,7 +71,7 @@ export async function handleRevalidate(
   try {
     axios.defaults.baseURL = baseURL;
     const data = await axios.post(
-      "/wygtech-oa/api/v1/safe/openSafe/validate",
+      "/base-platform/api/v1/safe/openSafe/validate",
       params
     );
     return data;
